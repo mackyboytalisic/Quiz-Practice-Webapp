@@ -5,12 +5,11 @@
   <title>Q&A Quiz Maker</title>
   <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-    <rect x="8" y="4" width="48" height="56" rx="6" ry="6" fill="%234CAF50" stroke="%23333" stroke-width="2"/>
-    <rect x="16" y="12" width="32" height="6" rx="1" fill="%23fff"/>
-    <rect x="16" y="22" width="32" height="6" rx="1" fill="%23fff"/>
-    <rect x="16" y="32" width="32" height="6" rx="1" fill="%23fff"/>
-    <circle cx="32" cy="48" r="6" fill="%23fff"/>
-    <text x="32" y="52" text-anchor="middle" font-size="6" fill="%234CAF50" font-family="Arial, sans-serif">?</text>
+    <rect x="8" y="8" width="48" height="48" rx="6" ry="6" fill="%23FF9800" stroke="%23333" stroke-width="2"/>
+    <line x1="16" y1="20" x2="48" y2="20" stroke="%23fff" stroke-width="3" stroke-linecap="round"/>
+    <line x1="16" y1="30" x2="48" y2="30" stroke="%23fff" stroke-width="3" stroke-linecap="round"/>
+    <line x1="16" y1="40" x2="36" y2="40" stroke="%23fff" stroke-width="3" stroke-linecap="round"/>
+    <polygon points="40,44 46,38 52,44 46,50" fill="%23fff"/>
   </svg>'>
   <style>
     body {
@@ -21,6 +20,7 @@
       color: #333;
     }
     .container {
+      position: relative;
       width: 100%;
       max-width: 100%;
       margin: auto;
@@ -30,11 +30,33 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       box-sizing: border-box;
     }
+    .dark-mode {
+      background: #121212;
+      color: #f5f5f5;
+    }
+    .dark-mode .container {
+      background: #1e1e1e;
+    }
+    .dark-mode button {
+      background: #333;
+      color: #f5f5f5;
+    }
+    .dark-mode button:hover {
+      background: #555;
+      transform: translateY(-2px);
+    }
+    .dark-mode pre,
+    .dark-mode textarea {
+      background: #1e1e1e;
+      color: #f5f5f5;
+    }
     h1 {
       text-align: center;
       margin-bottom: 20px;
     }
     textarea {
+      background: #ffffff;
+      color: #000000;
       width: 100%;
       min-height: 500px;
       resize: none;
@@ -56,21 +78,46 @@
       color: white;
       font-size: 14px;
     }
+    button:hover {
+      background: #1d4ed8;   /* darker blue */
+      transform: translateY(-2px);
+    }
     pre {
-      background: #272822;
-      color: #f8f8f2;
+      background: #dbdbdb;
+      color: #000000;
       padding: 15px;
       border-radius: 8px;
       overflow-x: auto;
       white-space: pre-wrap;
       word-break: break-word;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      line-height: 1.5;
+      box-sizing: border-box;
+    }
+    #topRightBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 8px 16px;
+      font-size: 14px;
+      background: #0a5714;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Q&A Quiz Maker</h1>
+    <button id="topRightBtn" onclick="openApp()">Open Quiz App</button>
     <p>Paste your Q&A text below (each question has 4 ;):</p>
+    <button onclick="navigator.clipboard.writeText(document.getElementById('inputText').value)">Copy</button>
+    <button onclick="document.getElementById('fileInput').click()">Import File</button>
+    <input type="file" id="fileInput" accept=".csv,.json" style="display:none;" />
+    <button onclick="toggleDarkMode()">Dark Mode</button>
     <textarea id="inputText" placeholder="Enter your Q&A text here.  
       Format for each question (4 semicolons per question):
       <question number>;
@@ -91,15 +138,21 @@
     <button onclick="convertToJson()">Convert to JSON</button>
     <button onclick="convertToCSV()">Convert to CSV</button>
     <h3>Result:</h3>
-    <pre id="output"></pre>
-    <button onclick="copyOutput()">Copy</button>
+    
+    <button onclick="navigator.clipboard.writeText(outputData)">Copy</button>
     <button onclick="downloadOutput()">Download</button>
+    <pre id="output"></pre>
   </div>
 
   <script>
     const textarea = document.getElementById("inputText");
     const output = document.getElementById("output");
+    let darkMode = false;
     let outputData = "";
+
+    function openApp() {
+      window.location.href = 'Quiz.html';
+    }
 
     // Auto expand textarea
     textarea.addEventListener("input", () => {
@@ -133,16 +186,15 @@
 
     function convertToCSV() {
       const questions = parseInput();
+      console.log(questions);
       let csv = "";
       questions.forEach(q => {
-        csv += `${q.question.replace(/\r?\n/g, "\\n")},${q.choices.join(",")},${q.answer}\n`;
+        csv += `"${q.question.replace(/\r?\n/g, "\\n")}",` + 
+                   q.choices.map(c => `"${c.replace(/"/g, '""')}"`).join(',') + ',' +
+               `${q.answer}\n`;
       });
       outputData = csv.trim();
       output.textContent = outputData;
-    }
-    function copyOutput() {
-      if (!outputData) return;
-      navigator.clipboard.writeText(outputData).then(() => alert("Copied!"));
     }
 
     function downloadOutput() {
@@ -154,6 +206,58 @@
       a.download = outputData.startsWith("{") ? "quiz.json" : "quiz.csv";
       a.click();
       URL.revokeObjectURL(url);
+    }
+
+    const fileInput = document.getElementById('fileInput');
+
+    fileInput.addEventListener('click', () => {fileInput.value = null;});
+    fileInput.addEventListener('change', handleFileImport);
+
+    function handleFileImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const content = e.target.result.trim();
+        let text = '';
+
+        if (file.name.endsWith('.json')) {
+          try {
+            const data = JSON.parse(content);
+            if (data.questions && Array.isArray(data.questions)) {
+              data.questions.forEach(q => {
+                text += `${q.q};\n${q.question.replace(/\\n/g, '\n')};\n${q.choices.join('\n')};\n${q.answer};\n`;
+              });
+            }
+          } catch (err) {
+            alert('Invalid JSON file');
+            return;
+          }
+        } else if (file.name.endsWith('.csv')) {
+          const lines = content.split(/\r?\n/).filter(l => l.trim());
+          lines.forEach(line => {
+            const parts = line.split(',');
+            const qText = parts[0].replace(/\\n/g, '\n');
+            const choices = parts.slice(1, parts.length - 1);
+            const answer = parts[parts.length - 1];
+            text += `Q?;\n${qText};\n${choices.join('\n')};\n${answer};\n`;
+          });
+        } else {
+          alert('Unsupported file type');
+          return;
+        }
+
+        textarea.value += text;
+        textarea.dispatchEvent(new Event('input')); // auto-expand
+      };
+
+      reader.readAsText(file);
+    }
+
+    function toggleDarkMode() {
+      darkMode = !darkMode;
+      document.body.classList.toggle('dark-mode', darkMode);
     }
   </script>
 </body>

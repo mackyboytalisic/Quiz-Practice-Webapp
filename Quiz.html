@@ -6,11 +6,12 @@
   <title>Quiz App</title>
   <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-    <rect x="8" y="8" width="48" height="48" rx="6" ry="6" fill="%23FF9800" stroke="%23333" stroke-width="2"/>
-    <line x1="16" y1="20" x2="48" y2="20" stroke="%23fff" stroke-width="3" stroke-linecap="round"/>
-    <line x1="16" y1="30" x2="48" y2="30" stroke="%23fff" stroke-width="3" stroke-linecap="round"/>
-    <line x1="16" y1="40" x2="36" y2="40" stroke="%23fff" stroke-width="3" stroke-linecap="round"/>
-    <polygon points="40,44 46,38 52,44 46,50" fill="%23fff"/>
+    <rect x="8" y="4" width="48" height="56" rx="6" ry="6" fill="%234CAF50" stroke="%23333" stroke-width="2"/>
+    <rect x="16" y="12" width="32" height="6" rx="1" fill="%23fff"/>
+    <rect x="16" y="22" width="32" height="6" rx="1" fill="%23fff"/>
+    <rect x="16" y="32" width="32" height="6" rx="1" fill="%23fff"/>
+    <circle cx="32" cy="48" r="6" fill="%23fff"/>
+    <text x="32" y="52" text-anchor="middle" font-size="6" fill="%234CAF50" font-family="Arial, sans-serif">?</text>
   </svg>'>
   <style>
     body {
@@ -24,6 +25,24 @@
       background: #121212;
       color: #f5f5f5;
     }
+    .dark-mode .container {
+      background: #1e1e1e;
+    }
+    .dark-mode button {
+      background: #333;
+      color: #f5f5f5;
+    }
+    .dark-mode button:hover {
+      background: #555;
+      transform: translateY(-2px);
+    }
+    .dark-mode .nav-btn {
+      background: #333;
+      color: #f5f5f5;
+    }
+    .dark-mode .nav-btn:hover {
+      background: #555;
+    }
     .container {
       width: 80%;
       max-width: 900px;
@@ -32,9 +51,6 @@
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    .dark-mode .container {
-      background: #1e1e1e;
     }
     button {
       padding: 10px 20px;
@@ -50,17 +66,6 @@
 
     button:hover {
       background: #1d4ed8;   /* darker blue */
-      transform: translateY(-2px);
-    }
-
-    /* Dark mode button style */
-    .dark-mode button {
-      background: #333;
-      color: #f5f5f5;
-    }
-
-    .dark-mode button:hover {
-      background: #555;
       transform: translateY(-2px);
     }
     h3 {
@@ -120,23 +125,37 @@
       background: #1d4ed8;
       transform: translateY(-2px);
     }
-    .nav-btn .dark-mode {
-      background: #333;
-      color: #f5f5f5;
-    }
-    .nav-btn:hover .dark-mode {
-      background: #555;
-    }
     .question-line {
       display: flex;
       align-items: flex-start;
       gap: 8px;
+    }
+    #topRightBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 8px 16px;
+      font-size: 14px;
+      background: none;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1 id="title">Quiz App</h1>
+    <button id="topRightBtn" onclick="openApp()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="40" height="40">
+        <rect x="8" y="8" width="48" height="48" rx="6" ry="6" fill="#FF9800" stroke="#333" stroke-width="2"/>
+        <line x1="16" y1="20" x2="48" y2="20" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+        <line x1="16" y1="30" x2="48" y2="30" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+        <line x1="16" y1="40" x2="36" y2="40" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+        <polygon points="40,44 46,38 52,44 46,50" fill="#fff"/>
+      </svg>
+    </button>
     <p id="progress"></p>
     <input type="file" id="fileInput" accept=".csv,.json" style="display:none;" />
     <button onclick="document.getElementById('fileInput').click()">Select Quiz</button>
@@ -157,6 +176,10 @@
     let darkMode = false;
     let mode = '';
     let userAnswers = [];
+
+    function openApp() {
+      window.location.href = 'Q&A%20Quiz%20Maker.html';
+    }
 
     fileInput.addEventListener('click', () => {fileInput.value = null;});
     document.getElementById('fileInput').addEventListener('change', handleFile);
@@ -185,13 +208,24 @@
     }
 
     function parseCSV(content) {
-      const lines = content.split(/\r?\n/);
+      const lines = content.split(/\r?\n/).filter(line => line.trim() !== '');
       return lines.map(line => {
-        const parts = line.split(',');
-        const q = parts[0].replace(/\r?\\n/g, "\n");
-        const answer = parts[parts.length - 1].replace(/\r/g, '').trim();
+        // Match CSV fields, handling quoted values with commas
+        const regex = /("([^"]*(?:""[^"]*)*)"|[^,]+)/g;
+        const parts = [];
+        let match;
+        while ((match = regex.exec(line)) !== null) {
+          let value = match[1].trim();
+          // Remove surrounding quotes and unescape double quotes
+          if (value.startsWith('"') && value.endsWith('"')) {
+            value = value.slice(1, -1).replace(/""/g, '"');
+          }
+          parts.push(value);
+        }
+        const q = (parts[0] || '').replace(/\\n/g, "\n");
+        const answer = (parts[parts.length - 1] || '').trim();
         const choices = parts.slice(1, parts.length - 1);
-        return { question: q, choices: choices, answer: answer };
+        return { question: q, choices, answer };
       });
     }
 
