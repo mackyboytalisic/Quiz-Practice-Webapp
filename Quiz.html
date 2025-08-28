@@ -240,25 +240,25 @@
     }
 
     function showQuestion() {
-      if (idx >= questions.length) {
+      if (currentQuestion >= questions.length) {
         showFinalResult();
         return;
       }
-      const q = questions[idx];
-      document.getElementById('progress').innerText = `Question ${idx+1} of ${questions.length}`;
-      let html = `<div id="${idx}" class="question-block"><h3>${q.question}</h3>`;
+      const q = questions[currentQuestion];
+      document.getElementById('progress').innerText = `Question ${currentQuestion+1} of ${questions.length}`;
+      let html = `<div id="${currentQuestion}" class="question-block"><h3>${q.question}</h3>`;
       let multiple = q.answer.includes('.') || q.answer.length > 1;
       html += `<p>${multiple ? 'Select option/s:' : 'Select an option:'}</p>`;
       q.choices.forEach((choice, i) => {
         const letter = String.fromCharCode(97 + i);
-        html += `<div class="choice" onclick="toggleSelect(${idx}, this, '${letter}', ${multiple})">
+        html += `<div class="choice" onclick="toggleSelect(${currentQuestion}, this, '${letter}', ${multiple})">
                    <span class="choice-letter">${letter.toUpperCase()}.</span>
                    <span class="choice-text">${choice}</span>
                    <span class="choice-answer" style="margin-left:8px; font-weight:bold;"></span>
                  </div>`;
       });
       html += `
-        <button id="submit-btn" onclick="submitAnswer(${idx})">Submit</button>
+        <button id="submit-btn" onclick="submitAnswer(${currentQuestion})">Submit</button>
         <button id="continue-btn" onclick="nextQuestion()" style="display:none;">Continue</button>
         <div id="warning" style="color: red; margin-top: 10px; display:none;">
           ⚠ Please select at least one option before submitting.
