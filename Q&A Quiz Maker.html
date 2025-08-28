@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Q&A Quiz Maker</title>
+  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+    <rect x="8" y="4" width="48" height="56" rx="6" ry="6" fill="%234CAF50" stroke="%23333" stroke-width="2"/>
+    <rect x="16" y="12" width="32" height="6" rx="1" fill="%23fff"/>
+    <rect x="16" y="22" width="32" height="6" rx="1" fill="%23fff"/>
+    <rect x="16" y="32" width="32" height="6" rx="1" fill="%23fff"/>
+    <circle cx="32" cy="48" r="6" fill="%23fff"/>
+    <text x="32" y="52" text-anchor="middle" font-size="6" fill="%234CAF50" font-family="Arial, sans-serif">?</text>
+  </svg>'>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: 0;
+      background: #f4f4f4;
+      color: #333;
+    }
+    .container {
+      width: 100%;
+      max-width: 100%;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 500px;
+      resize: none;
+      overflow: hidden;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      line-height: 1.5;
+      box-sizing: border-box;
+    }
+    button {
+      margin: 5px 5px 5px 0;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+      font-size: 14px;
+    }
+    pre {
+      background: #272822;
+      color: #f8f8f2;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Q&A Quiz Maker</h1>
+    <p>Paste your Q&A text below (each question has 4 ;):</p>
+    <textarea id="inputText" placeholder="Enter your Q&A text here.  
+      Format for each question (4 semicolons per question):
+      <question number>;
+      <question text (can be multiple lines)>;
+      <choices (each choice on a separate line)>;
+      <answer> (multiple answer separates with period);
+      
+      Example:
+      Q1;                 2;
+      Add:                Select all letters.;
+      What is 2+2?;       4
+      1                   a
+      2                   5
+      3                   b;
+      4;                  b.d;
+      d;"></textarea>
+    <br>
+    <button onclick="convertToJson()">Convert to JSON</button>
+    <button onclick="convertToCSV()">Convert to CSV</button>
+    <h3>Result:</h3>
+    <pre id="output"></pre>
+    <button onclick="copyOutput()">Copy</button>
+    <button onclick="downloadOutput()">Download</button>
+  </div>
+
+  <script>
+    const textarea = document.getElementById("inputText");
+    const output = document.getElementById("output");
+    let outputData = "";
+
+    // Auto expand textarea
+    textarea.addEventListener("input", () => {
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+    });
+
+    function parseInput() {
+      const text = textarea.value.trim();
+      if (!text) return [];
+
+      const tokens = text.split(";").map(t => t.trim()).filter(t => t);
+      const questions = [];
+
+      for (let i = 0; i < tokens.length; i += 4) {
+        const qNum = tokens[i] || (`Q${questions.length + 1}`);
+        let qText = tokens[i + 1] || "";
+        const choicesRaw = tokens[i + 2] || "";
+        const choices = choicesRaw.split(/\r?\n/).map(c => c.trim()).filter(c => c);
+        const answer = tokens[i + 3] || "";
+        questions.push({ q: qNum, question: qText, choices, answer });
+      }
+      return questions;
+    }
+
+    function convertToJson() {
+      const questions = parseInput();
+      outputData = JSON.stringify({ questions }, null, 2);
+      output.textContent = outputData;
+    }
+
+    function convertToCSV() {
+      const questions = parseInput();
+      let csv = "";
+      questions.forEach(q => {
+        csv += `${q.question.replace(/\r?\n/g, "\\n")},${q.choices.join(",")},${q.answer}\n`;
+      });
+      outputData = csv.trim();
+      output.textContent = outputData;
+    }
+    function copyOutput() {
+      if (!outputData) return;
+      navigator.clipboard.writeText(outputData).then(() => alert("Copied!"));
+    }
+
+    function downloadOutput() {
+      if (!outputData) return;
+      const blob = new Blob([outputData], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = outputData.startsWith("{") ? "quiz.json" : "quiz.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

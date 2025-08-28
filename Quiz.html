@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz App</title>
+  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+    <rect x="8" y="8" width="48" height="48" rx="6" ry="6" fill="%23FF9800" stroke="%23333" stroke-width="2"/>
+    <line x1="16" y1="20" x2="48" y2="20" stroke="%23fff" stroke-width="3" stroke-linecap="round"/>
+    <line x1="16" y1="30" x2="48" y2="30" stroke="%23fff" stroke-width="3" stroke-linecap="round"/>
+    <line x1="16" y1="40" x2="36" y2="40" stroke="%23fff" stroke-width="3" stroke-linecap="round"/>
+    <polygon points="40,44 46,38 52,44 46,50" fill="%23fff"/>
+  </svg>'>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      text-align: center;
+      padding: 20px;
+    }
+    .dark-mode {
+      background: #121212;
+      color: #f5f5f5;
+    }
+    .container {
+      width: 80%;
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .dark-mode .container {
+      background: #1e1e1e;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      background: #2563eb;   /* blue primary */
+      color: #fff;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    button:hover {
+      background: #1d4ed8;   /* darker blue */
+      transform: translateY(-2px);
+    }
+
+    /* Dark mode button style */
+    .dark-mode button {
+      background: #333;
+      color: #f5f5f5;
+    }
+
+    .dark-mode button:hover {
+      background: #555;
+      transform: translateY(-2px);
+    }
+    h3 {
+      text-align: left;
+      white-space: pre-line;
+    }
+    .choice {
+      display: flex;
+      align-items: center;
+      margin: 8px auto;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      max-width: 500px;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.2s;
+    }
+    .choice.disabled {
+      pointer-events: none;
+    }
+    .choice:hover {
+      background: #e9e9e9;
+    }
+    .choice-letter {
+      font-weight: bold;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+    .choice-text {
+      flex-grow: 1;
+    }
+    .choice.selected {
+      background-color: #3399FF;
+      color: white;
+    }
+    .choice.correct {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .choice.incorrect {
+      background-color: #F44336;
+      color: white;
+    }
+    .nav-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .nav-btn:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+    }
+    .nav-btn .dark-mode {
+      background: #333;
+      color: #f5f5f5;
+    }
+    .nav-btn:hover .dark-mode {
+      background: #555;
+    }
+    .question-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="title">Quiz App</h1>
+    <p id="progress"></p>
+    <input type="file" id="fileInput" accept=".csv,.json" style="display:none;" />
+    <button onclick="document.getElementById('fileInput').click()">Select Quiz</button>
+    <button onclick="toggleDarkMode()">Dark Mode</button>
+    <button onclick="restartQuiz()">Restart</button>
+    <div id="modeSelect" style="display:none;">
+      <p>Select Mode:</p>
+      <button onclick="startQuiz('single')">Single Question Mode</button>
+      <button onclick="startQuiz('all')">Show All Questions Mode</button>
+    </div>
+    <div id="quiz"></div>
+  </div>
+
+  <script>
+    let questions = [];
+    let currentQuestion = 0;
+    let score = 0;
+    let darkMode = false;
+    let mode = '';
+    let userAnswers = [];
+
+    fileInput.addEventListener('click', () => {fileInput.value = null;});
+    document.getElementById('fileInput').addEventListener('change', handleFile);
+
+    function handleFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      document.getElementById('title').innerText = file.name.replace(/\.[^/.]+$/, "");
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const content = e.target.result.trim();
+        if (file.name.endsWith('.json')) {
+          const data = JSON.parse(content);
+          questions = data.questions;
+        } else {
+          questions = parseCSV(content);
+        }
+        questions = shuffleQuiz(questions);
+        score = 0;
+        currentQuestion = 0;
+        userAnswers = [];
+        document.getElementById('modeSelect').style.display = 'block';
+        document.getElementById('quiz').innerHTML = '';
+      };
+      reader.readAsText(file);
+    }
+
+    function parseCSV(content) {
+      const lines = content.split(/\r?\n/);
+      return lines.map(line => {
+        const parts = line.split(',');
+        const q = parts[0].replace(/\r?\\n/g, "\n");
+        const answer = parts[parts.length - 1].replace(/\r/g, '').trim();
+        const choices = parts.slice(1, parts.length - 1);
+        return { question: q, choices: choices, answer: answer };
+      });
+    }
+
+    function startQuiz(selectedMode) {
+      mode = selectedMode;
+      document.getElementById('modeSelect').style.display = 'none';
+      if (mode === 'single') {
+        showQuestion();
+      } else {
+        showAllQuestions();
+      }
+    }
+
+    function showQuestion() {
+      if (idx >= questions.length) {
+        showFinalResult();
+        return;
+      }
+      const q = questions[idx];
+      document.getElementById('progress').innerText = `Question ${idx+1} of ${questions.length}`;
+      let html = `<div id="${idx}" class="question-block"><h3>${q.question}</h3>`;
+      let multiple = q.answer.includes('.') || q.answer.length > 1;
+      html += `<p>${multiple ? 'Select option/s:' : 'Select an option:'}</p>`;
+      q.choices.forEach((choice, i) => {
+        const letter = String.fromCharCode(97 + i);
+        html += `<div class="choice" onclick="toggleSelect(${idx}, this, '${letter}', ${multiple})">
+                   <span class="choice-letter">${letter.toUpperCase()}.</span>
+                   <span class="choice-text">${choice}</span>
+                   <span class="choice-answer" style="margin-left:8px; font-weight:bold;"></span>
+                 </div>`;
+      });
+      html += `
+        <button id="submit-btn" onclick="submitAnswer(${idx})">Submit</button>
+        <button id="continue-btn" onclick="nextQuestion()" style="display:none;">Continue</button>
+        <div id="warning" style="color: red; margin-top: 10px; display:none;">
+          ⚠ Please select at least one option before submitting.
+        </div></div>
+      `;
+      document.getElementById('quiz').innerHTML = html;
+    }
+
+    function showAllQuestions() {
+      document.getElementById('progress').innerText = `All ${questions.length} Questions`;
+      let html = '';
+      questions.forEach((q, idx) => {
+        let multiple = q.answer.includes('.') || q.answer.length > 1;
+        html += `<div id="${idx}" class="question-block">
+                  <div class="question-line">
+                    <h3 class="q-num">${idx + 1}.</h3>
+                    <h3 class="q-text" style="white-space: pre-line;">${q.question}</h3>
+                  </div>
+                  <p>${multiple ? 'Select option/s:' : 'Select an option:'}</p>
+        `;
+        q.choices.forEach((choice, i) => {
+          const letter = String.fromCharCode(97 + i);
+          let selected = (userAnswers[idx] && userAnswers[idx].includes(letter)) ? 'selected' : '';
+          html += `<div class="choice ${selected}" onclick="toggleSelect(${idx}, this, '${letter}', ${multiple})">
+                    <span class="choice-letter">${letter.toUpperCase()}.</span>
+                    <span class="choice-text">${choice}</span>
+                  </div>`;
+        });
+        html += `</div>`; // close question-block
+      });
+
+      html += `
+        <div style="display: flex; justify-content: center; margin-top:20px;">
+          <div class="singleMode">
+            <button onclick="renderSingleMode()">Single Mode</button>
+          </div>
+          <div class="allMode" style="display:none;">
+            <button onclick="renderAllMode()">Show All</button>
+            <button class="nav-btn prev" onclick="changeQuestion(-1)">⟨ Prev</button>
+            <button class="nav-btn next" onclick="changeQuestion(1)">Next ⟩</button>
+          </div>
+          <button onclick="showFinalResult()">Submit All</button>
+        </div>
+      `;
+
+      document.getElementById('quiz').innerHTML = html;
+
+      // Track which question is visible in single mode
+      let currentIndex = 0;
+
+      // Show only one question
+      window.renderSingleMode = function () {
+        document.querySelector('.singleMode').style.display = 'none';
+        document.querySelector('.allMode').style.display = 'flex';
+
+        const blocks = document.querySelectorAll('.question-block');
+        blocks.forEach((b, idx) => {
+          b.style.display = idx === currentIndex ? 'block' : 'none';
+        });
+
+        document.getElementById('progress').innerText =
+          `Question ${currentIndex + 1} of ${questions.length}`;
+      };
+
+      // Show all questions back
+      window.renderAllMode = function () {
+        document.querySelector('.singleMode').style.display = 'flex';
+        document.querySelector('.allMode').style.display = 'none';
+
+        const blocks = document.querySelectorAll('.question-block');
+        blocks.forEach(b => b.style.display = 'block');
+
+        document.getElementById('progress').innerText =
+          `All ${questions.length} Questions`;
+      };
+
+      // Navigate in single mode
+      window.changeQuestion = function (step) {
+        const blocks = document.querySelectorAll('.question-block');
+        currentIndex = Math.min(Math.max(0, currentIndex + step), questions.length - 1);
+
+        blocks.forEach((b, idx) => {
+          b.style.display = idx === currentIndex ? 'block' : 'none';
+        });
+
+        document.getElementById('progress').innerText =
+          `Question ${currentIndex + 1} of ${questions.length}`;
+      };
+    }
+
+    function toggleSelect(qIndex, element, letter, multiple) {
+
+      if (!userAnswers[qIndex]) {
+        userAnswers[qIndex] = [];
+      }
+
+      if (multiple) {
+        // ✅ Multi-select: toggle ON/OFF
+        if (element.classList.contains('selected')) {
+          element.classList.remove('selected');
+          userAnswers[qIndex] = userAnswers[qIndex].filter(l => l !== letter);
+        } else {
+          element.classList.add('selected');
+          userAnswers[qIndex].push(letter);
+        }
+      } else {
+        // ✅ Single-select: clear previous, select only one
+        document.getElementById(qIndex).querySelectorAll('#quiz .choice').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        userAnswers[qIndex] = [letter];
+      }
+
+      // hide warning if something is selected
+      if (userAnswers[qIndex].length > 0 && document.getElementById('warning')) {
+        document.getElementById('warning').style.display = 'none';
+      }
+    }
+
+    function submitAnswer(idx) {
+      if (!userAnswers[idx] || userAnswers[idx].length === 0) {
+        document.getElementById('warning').style.display = 'block';
+        return; // stop submission
+      } else {
+        document.querySelectorAll(".choice").forEach(c => c.classList.add("disabled"));
+      }
+      document.getElementById('submit-btn').style.display = 'none';
+      document.getElementById('continue-btn').style.display = 'inline-block';
+      const q = questions[idx];
+      let selected = Array.from(document.querySelectorAll('.choice.selected')).map(el => el.querySelector('.choice-letter').innerText[0].toLowerCase());
+      if (!selected.length) return;
+      userAnswers[idx] = selected;
+      const correct = q.answer.split('.');
+      selected.forEach(letter => {
+        const el = [...document.querySelectorAll('.choice')].find(e => e.querySelector('.choice-letter').innerText.startsWith(letter.toUpperCase()));
+        const ansSpan = el.querySelector('.choice-answer');
+        if (correct.includes(letter)) {
+          el.classList.add('correct');
+          ansSpan.innerText = '✔';
+        } else {
+          el.classList.add('incorrect');
+          ansSpan.innerText = '✖';
+        }
+      });
+      correct.forEach(letter => {
+        const el = [...document.querySelectorAll('.choice')].find(e => e.querySelector('.choice-letter').innerText.startsWith(letter.toUpperCase()));
+        if (el) el.classList.add('correct');
+      });
+      if (arraysEqual(selected.sort(), correct.sort())) score++;
+    }
+
+    function nextQuestion() {
+      document.getElementById('submit-btn').style.display = 'inline-block';
+      document.getElementById('continue-btn').style.display = 'none';
+      currentQuestion++;
+      showQuestion();
+    }
+
+    function showFinalResult() {
+      let html = `<h2>Your Score: ${score}/${questions.length}</h2>`;
+      questions.forEach((q, idx) => {
+        html += `<div class="question-line"><h3>${idx+1}.<h3><h3>${q.question}</h3></div>`;
+        q.choices.forEach((choice, i) => {
+          const letter = String.fromCharCode(97 + i);
+          let classes = '';
+          let symbol = '';
+          if ((userAnswers[idx] || []).includes(letter)) {
+            if (q.answer.split('.').includes(letter)) {
+              classes +='correct';
+              symbol = '✔';
+            } else {
+              classes +='incorrect';
+              symbol = '✖';
+            }
+          } else if (q.answer.split('.').includes(letter)) {
+            classes += 'correct';
+          }
+          html += `<div class="choice ${classes}">
+                     <span class="choice-letter">${letter.toUpperCase()}.</span>
+                     <span class="choice-text">${choice}</span>
+                     <span style="margin-left:8px; font-weight:bold;">${symbol}</span>
+                   </div>`;
+        });
+      });
+      document.getElementById('quiz').innerHTML = html;
+    }
+
+    function restartQuiz() {
+      questions = shuffleQuiz(questions);
+      score = 0;
+      currentQuestion = 0;
+      userAnswers = {};
+      document.getElementById('modeSelect').style.display = 'block';
+      document.getElementById('quiz').innerHTML = '';
+    }
+
+    function toggleDarkMode() {
+      darkMode = !darkMode;
+      document.body.classList.toggle('dark-mode', darkMode);
+    }
+
+    function shuffleQuiz(questions) {
+      function shuffle(arr) {
+        return arr
+          .map((item, index) => ({ item, index, sort: Math.random() }))
+          .sort((a, b) => a.sort - b.sort)
+          .map(({ item }) => item);
+      }
+
+      const letters = ["a", "b", "c", "d", "e", "f", "g"];
+
+      // First scramble all questions
+      let scrambledQuestions = shuffle(questions);
+
+      // Then scramble choices for each question
+      scrambledQuestions = scrambledQuestions.map(q => {
+        const correctLetters = q.answer.split(".");
+
+        // Pair each choice with its original letter
+        const paired = q.choices.map((choice, idx) => ({
+          choice,
+          letter: letters[idx]
+        }));
+
+        // Shuffle choices
+        const shuffled = shuffle(paired);
+
+        // New choices
+        const newChoices = shuffled.map(item => item.choice);
+
+        // Remap answers
+        const newAnswer = shuffled
+          .map((item, newIndex) => {
+            if (correctLetters.includes(item.letter)) {
+              return letters[newIndex];
+            }
+            return null;
+          })
+          .filter(Boolean)
+          .join(".");
+
+        return {
+          ...q,
+          choices: newChoices,
+          answer: newAnswer
+        };
+      });
+
+      return scrambledQuestions;
+    }
+
+    function arraysEqual(a, b) {
+      return JSON.stringify(a) === JSON.stringify(b);
+    }
+  </script>
+</body>
+</html>
