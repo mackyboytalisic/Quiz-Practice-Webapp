@@ -1,0 +1,271 @@
+{
+  "questions": [
+    {
+      "q": "1",
+      "question": "Which two formatting elements are supported in the enhanced rich text editor?",
+      "choices": [
+        "Bulleted lists",
+        "Interactive charts",
+        "Tables",
+        "Embedded videos"
+      ],
+      "answer": "a.c"
+    },
+    {
+      "q": "2",
+      "question": "A Compensation Analyst needs to define a new Senior Data Scientist job in Oracle HCM Cloud and categorize it under the existing information Technology job family.\nWhich statement is true about configuring this?",
+      "choices": [
+        "The new job is established during the creation of the organizational structure and later linked to the job family",
+        "The new job is created as a direct subrecord within the existing Information Technology job family.",
+        "The new job is initiated from within the information Technology job family by selecting the family first.",
+        "The new job is defined first and then associated with the Information Technology job family."
+      ],
+      "answer": "d"
+    },
+    {
+      "q": "3",
+      "question": "What impact does the Employment Model setting have on the worker assignment process in Oracle HCM Cloud?",
+      "choices": [
+        "It defines the unique attributes and processes applicable to a worker's assignment andlifecycle.",
+        "It determines the security roles that can be assigned to a worker.",
+        "It dictates the end-to-end workflow and necessary approval steps for hiring andonboarding a worker."
+      ],
+      "answer": "a"
+    },
+    {
+      "q": "4",
+      "question": "An HR team has configured a new descriptive flexfield (DFF) on the employee assignment record in Oracle HCM Cloud. This DFF is intended to capture a[...] Team Lead, Developer QAAnalyst.\nHow do you establish these values as a selectable list for the DFF?",
+      "choices": [
+        "Establish a new business rule or policy within the system's configuration that embeds and manages all the custom lookup values for the spe",
+        "Define the lookup type and its associated codes and display meanings without considering temporal validity.",
+        "Define the lookup type, followed by specifying unique lookup codes, their display meanings, and their respective effective dates for validity."
+      ],
+      "answer": "c"
+    },
+    {
+      "q": "5",
+      "question": "Which statement is true about the relationship between a person record and work relationships in Oracle HCM Cloud's data structure?",
+      "choices": [
+        "Every work relationship record represents a unique individual, and multiple work relationships cannot be linked to the same person record over time.",
+        "A single person record can link to multiple employment or contingent work instances, each managed by a separate work relationship record.",
+        "Every person record must correspond to a single, unique work relationship record at any given time to ensure data integrity."
+      ],
+      "answer": "b"
+    },
+    {
+      "q": "6",
+      "question": "An employee currently employed by Global Tech US needs to be transferred to a new role under Global Tech UK.\nWhat action should an HR Specialist take in Oracle HCM Cloud to process this type of transfer?",
+      "choices": [
+        "Initiate a Global Transfer transaction on the existing employment record, specifying the new Global Tech UK legal employer, effective date, and other records",
+        "Completely terminate existing employment record with Global Tech US and initiate a new hire process for him under Global Tech UK, creating a break",
+        "Initiate a new Hire transaction directly from the Global Tech UK legal entity and link it to the existing person record."
+      ],
+      "answer": "a"
+    },
+    {
+      "q": "7",
+      "question": "An employee, is promoted to [...] position with a different job and reporting structure within the same legal employer in Oracle HCM Cloud.\nWhat action must an HR Administrator perform to process this promotion and update her assignment details?",
+      "choices": [
+        "Perform a Promotion action on the existing employment record, specifying the effective date, new job, new position, and new reporting manager.",
+        "Terminate the current employment record, process all the final payments and benefits, and then initiate a New Hire transaction into the promoted job and position, and creating a new work relationship.",
+        "Access the Management screen for the new position and use an Assign Employee function to link the employee to it with an effective date."
+      ],
+      "answer": "a"
+    },
+    {
+      "q": "8",
+      "question": "A manager needs to reassign one of their direct reports to a different manager. Assuming the initiating manager has the necessary self-service privileges in Oracle HCM Cloud, what action should be taken to process this reassignment?",
+      "choices": [
+        "Edit the employee's position record by directly updating the Reports To field to reflect the new manager.",
+        "The new manager must initiate a Hire or Add Direct Report transaction, ensuring the employee's history is carried over, and then confirm the reporting change in their Manager dashboard.",
+        "From the list of direct reports, the current manager should initiate a Change Manager action, enter the new manager's name, and provide the effective date of the reassignment."
+      ],
+      "answer": "c"
+    },
+    {
+      "q": "9",
+      "question": "An HR Specialist needs to upload a scanned copy of an employee's visa document into Oracle HCM Cloud to maintain their employment records.\nHow would HR Specialist use the Document Management functionality to do this?",
+      "choices": [
+        "Access the employee's record and use the Attachments feature to upload the document, which does not allow for categorization by Document Type, automatic metadata capture, or linking to a document management system.",
+        "Go to a central Manage Document Records administrative area, upload the document there, and then manually link it to the employee's profile.",
+        "Access the employee's record, use the Document Records function, select the appropriate Document Type, upload the scanned file, and input any required descriptive details or metadata."
+      ],
+      "answer": "c"
+    },
+    {
+      "q": "10",
+      "question": "A consultant assigns an HR job role to a new Human Resources Business Partner, but the user still can't view employee data.\nWhat is the reason for this?",
+      "choices": [
+        "Data roles do not inherit privileges from abstract roles.",
+        "Function security must be enabled manually.",
+        "Job roles override duty roles by default.",
+        "A job role alone does not grant data access."
+      ],
+      "answer": "d"
+    },
+    {
+      "q": "11",
+      "question": "A company needs to implement a workflow for complex employee promotions in Oracle HCM Goud, requiring multiple levels of managerial review. After these approvals, the HR department must verify documents and update the employee's record before finalization.\nHow would you configure this using Oracle HCM Cloud features?",
+      "choices": [
+        "Configure only notification settings to inform managers and HR at each completed stage of the promotion process.",
+        "Define an \"If condition to direct the approval to managers, with an automated \"Then\" statement to update the employee record.",
+        "Create a broad approval policy that allows both managers and HR to approve the transaction concurrently.",
+        "Set up sequential managerial approvals, followed by routing to an HR Representative using an Area of Responsibility lookup."
+      ],
+      "answer": "d"
+    },
+    {
+      "q": "12",
+      "question": "An HR department wants to configure an employee promotion workflow so that a promotion with a salary increase over a certain threshold follows an executive path, whereas others follow standard path[...]\nWhich configuration setup enables conditional routing in Oracle HCM Cloud?",
+      "choices": [
+        "Establishing detailed notification policies for different approver groups",
+        "Configuring IF and THEN statements within the approval rules",
+        "Using Approval Groups combined with specific approver types for each path",
+        "Defining vacation rules based on the new promotion's salary increase"
+      ],
+      "answer": "b"
+    },
+    {
+      "q": "13",
+      "question": "A company's employee promotion workflow in Oracle HCM Cloud begins with an Initiation activity for the promotion request. After the manager submits the request, it moves to an HR\nReview Activity. If HR reviews the promotion details and finds discrepancies, the workflow needs to send the request back to the originator for revisions before it can proceed to final approval.\nHow do you set up Workflow Paths to loop the request back to the originator for revisions if the promotion details are not approved by HR?",
+      "choices": [
+        "A single workflow path from HR Review that always leads to Final Approval, with revisions handled outside the workflow",
+        "A workflow path from HR Review to a new Revision Task activity, which then automatically terminates the workflow if revisions are made",
+        "Two workflow paths from the HR Review activity: one conditioned for Approved status leading to Final Approval, and another conditioned for Rejected/Needs Revision status leading back to Initiation activity",
+        "Configuring the HR Review activity to include an option to restart the entire workflow from the beginning if revisions are needed"
+      ],
+      "answer": "c"
+    },
+    {
+      "q": "14",
+      "question": "An employee is receiving various workflow notifications for Core HR tasks, including those requiring action and those that are purely informational. They want to manage this list of notification[...] HCM Cloud.\nWhich action can they perform directly from their worklist on the For Your Information (FYI) workflow task?",
+      "choices": [
+        "Dismiss an FYI workflow task to remove it from their active notification list.",
+        "Permanently disable all incoming email notifications for all future workflow tasks from any module.",
+        "Change the global notification mode to affect how all pending workflow tasks are delivered across the entire organization.",
+        "Configure custom sound alerts for newly received workflow notifications based on their urgency or type."
+      ],
+      "answer": "a"
+    },
+    {
+      "q": "15",
+      "question": "An employee's location change request has been pending approval for a long time, delaying their relocation. An HR consultant needs to ensure this request is processed immediately by [...] the workflow.\nHow should the consultant use the Transaction Console to escalate this pending location change request?",
+      "choices": [
+        "Submit a new, identical location change request with an Urgent flag to bypass the existing stalled workflow.",
+        "Edit the approval rules for location changes to automatically reassign overdue tasks, then wait for the system to apply the change",
+        "Locate the pending request on the Transaction Summary tab, select it, and choose Escalate.",
+        "Access the BPM Worklist, find the task in the Assigned to Me section, and use the Escalate option there."
+      ],
+      "answer": "c"
+    },
+    {
+      "q": "16",
+      "question": "An HR department needs to establish a consistent set of quick access tasks on the springboard for all its HR Specialists, providing streamlined access to their most frequently used Core [...]\nHow would a consultant configure the springboard to support this requirement?",
+      "choices": [
+        "Directly modify individual HR Specialist profiles to add preferred tasks to their personal Quick Actions list.",
+        "Apply Page Composer on the home page to embed direct links to relevant tasks within existing infolets.",
+        "Use the Appearance work area to define a global springboard layout that applies universally to all users",
+        "Define a custom springboard layout in a sandbox and publish it, associating this layout with the HR Specialist job role."
+      ],
+      "answer": "d"
+    },
+    {
+      "q": "17",
+      "question": "An HR consultant is using Visual Builder Studio (VBS) in Express Mode to customize an HCM Cloud page. They need to update attributes for various fields on the page’s visual canvas, such as [...] name, editable status, default value, or visibility.\nWhich action must the consultant perform to apply these changes in VBS Express?",
+      "choices": [
+        "Set up a new business rule and edit the field attributes as necessary to meet the organization's needs.",
+        "Right-click the selected component and choose View Source Code from the context menu.",
+        "Drag the selected component to the Component Palette to reveal its properties. Use the Business Rules tab to directly edit the component's static attributes using a scripting language."
+      ],
+      "answer": "a"
+    },
+    {
+      "q": "18",
+      "question": "An HR Administrator is building a new internal mobility Journey and wants to avoid creating it from scratch.\nHow do Journey Templates assist with this task?",
+      "choices": [
+        "They restrict Journeys to single-activity layouts for standardization.",
+        "They export previous Journey outcomes for analytics.",
+        "They provide a reusable configuration of tasks, roles, and visibility settings.",
+        "They store completed Journeys for archival purposes."
+      ],
+      "answer": "c"
+    },
+    {
+      "q": "19",
+      "question": "A consultant is configuring a New Hire Onboarding Journey to target employees hired within the last 30 days for the Customer Support Representative role.\nWhich method should they use to define this audience?",
+      "choices": [
+        "Assign the Journey manually to each new hire.",
+        "Create an eligibility profile with criteria for hire date and job role.",
+        "Send a communication campaign to all employees.",
+        "Use a filtered list based on department and location."
+      ],
+      "answer": "b"
+    },
+    {
+      "q": "20",
+      "question": "A client wants to automate parts of its onboarding process, including provisioning laptops and notifying the Security team for badge creation.\nHow does Oracle Process Automation streamline this experience?",
+      "choices": [
+        "It sends a consolidated PDF report of Journey steps.",
+        "It allows users to skip tasks manually based on workflow rules.",
+        "It creates static checklists that replace dynamic Journeys.",
+        "It triggers back-end actions and orchestrates tasks across systems based on Journey inputs."
+      ],
+      "answer": "d"
+    },
+    {
+      "q": "21",
+      "question": "An HR leader is reviewing post-journey survey data for a recent offboarding Journey.\nHow does this data support employee experience improvements?",
+      "choices": [
+        "It ensures that all compliance checklists were followed.",
+        "It replaces the need for separate performance evaluations.",
+        "It validates onboarding time metrics across business units.",
+        "It identifies sentiment patterns and highlights friction points in the Journey."
+      ],
+      "answer": "d"
+    },
+    {
+      "q": "22",
+      "question": "A client is evaluating how to incorporate Al into its HR operations and is debating whether to develop custom Al models or use Oracle's embedded Al features.\nWhat benefit does Oracle's embedded Al approach within HCM Cloud offer?",
+      "choices": [
+        "Unlimited customization options across all modules",
+        "Open integration with any third-party ML framework",
+        "Prebuilt use cases with continuous updates and Oracle support",
+        "Full control over algorithm selection and model training"
+      ],
+      "answer": "c"
+    },
+    {
+      "q": "23",
+      "question": "An Implementer wants to fine-tune how Al recommends candidates based on job requirements.\nWhich configuration action should they perform within the Al Applications Administration area?",
+      "choices": [
+        "Limit Al analysis to internal candidate profiles only.",
+        "Disable external resume parsing to reduce bias.",
+        "Adjust the weightings of attributes like skills, titles, and location.",
+        "Change requisition templates to prefilter applications."
+      ],
+      "answer": "c"
+    },
+    {
+      "q": "24",
+      "question": "A Recruiter is hiring for a Principal Solutions Architect but is struggling to find a deep candidate pool.\nHow can the Similar Jobs feature help?",
+      "choices": [
+        "By automatically ranking interview panel performance",
+        "By pushing requisitions to Oracle Talent Marketplace only",
+        "By analyzing job descriptions and suggesting related roles for sourcing",
+        "By alerting HR to prioritize faster onboarding"
+      ],
+      "answer": "c"
+    },
+    {
+      "q": "25",
+      "question": "A consultant is preparing to enable Time to Hire predictions for a client.\nWhich prerequisite ensures accurate Al predictions?",
+      "choices": [
+        "Enabling requisition-based interview scheduling across departments",
+        "Enabling machine learning acceleration in all HCM modules",
+        "Successful ingestion of enterprise-specific recruiting data",
+        "Completing setup of audit trails in Talent Acquisition"
+      ],
+      "answer": "c"
+    }
+  ]
+}
